@@ -16,13 +16,13 @@ parser = argparse.ArgumentParser(description='Physics Informed Neural Networks f
 
 parser.add_argument('--n_iter', type=int, default=int(1e10), help='Number of iterations')
 parser.add_argument('--log_every', type=int, default=1000, help='Log every n steps')
-parser.add_argument('--available_time', type=int, default=5, help='Available time in minutes')
+parser.add_argument('--available_time', type=int, default=2, help='Available time in minutes')
 parser.add_argument('--log_output_fields', nargs='+', default=['Ux', 'Uy', 'Sxx', 'Syy', 'Sxy'], help='Fields to log')
 parser.add_argument('--net_type', choices=['spinn', 'pfnn'], default='spinn', help='Type of network')
 parser.add_argument('--bc_type', choices=['hard', 'soft'], default='hard', help='Type of boundary condition')
 parser.add_argument('--mlp', choices=['mlp', 'modified_mlp'], default='mlp', help='Type of MLP for SPINN')
 parser.add_argument('--n_DIC', type=int, default=6, help='Number of DIC') # n_DIC**2 points
-parser.add_argument('--noise_ratio', type=float, default=0.1, help='Noise ratio')
+parser.add_argument('--noise_ratio', type=float, default=0, help='Noise ratio')
 parser.add_argument('--lr', type=float, default=0.001, help='Learning rate')
 parser.add_argument('--u_0', type=float, default=1e-4, help='Displacement scaling factor')
 parser.add_argument('--loss_weights', nargs='+', type=float, default=[1,1,1,1,1,1e8,1e8], help='Loss weights (more on DIC points)')
@@ -204,8 +204,8 @@ U_DIC = solution_fn(X_DIC_input)[:,:2]
 noise_floor = noise_ratio * np.std(U_DIC)
 U_DIC += np.random.normal(0, noise_floor, U_DIC.shape)
 
-measure_Ux = dde.PointSetOperatorBC(X_DIC_input, U_DIC[:, 0:1], lambda x, f, x_np: f[0][:,0])
-measure_Uy = dde.PointSetOperatorBC(X_DIC_input, U_DIC[:, 1:2], lambda x, f, x_np: f[0][:,1])
+measure_Ux = dde.PointSetOperatorBC(X_DIC_input, U_DIC[:, 0:1], lambda x, f, x_np: f[0][:,0:1])
+measure_Uy = dde.PointSetOperatorBC(X_DIC_input, U_DIC[:, 1:2], lambda x, f, x_np: f[0][:,1:2])
 
 bcs = []
 num_boundary = 0
